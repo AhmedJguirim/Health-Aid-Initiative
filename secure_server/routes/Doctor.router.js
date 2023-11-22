@@ -10,7 +10,7 @@ router.post("/doctors", doctorController.createDoctor);
 router.post("/doctors/authenticate", doctorController.authenticateDoctor);
 
 // Routes that require JWT authentication
-router.use(jwtMiddleware.verifyAccessToken);
+// router.use(jwtMiddleware.verifyAccessToken);
 
 // Route to get details of a specific doctor
 router.get("/doctors/:doctorID", doctorController.getDoctorDetails);

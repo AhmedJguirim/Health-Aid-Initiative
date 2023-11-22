@@ -12,13 +12,15 @@ router.post("/patients", patientController.createPatient);
 router.post("/patients/checkCardValidity", patientController.checkCardValidity);
 
 // Routes that require JWT authentication
-router.use(jwtMiddleware.verifyAccessToken);
+// router.use(jwtMiddleware.verifyAccessToken);
 
 // Get all patients
 router.get("/patients", patientController.getAllPatients);
 
 // Get a specific patient by ID
-router.get("/patients/:patientId", patientController.getPatientById);
+router.get("/patients/:code", patientController.getPatientByCode);
+// Get a specific patient by ID
+router.get("/patients/lastCard/:patientId", patientController.getLastValidCard);
 
 // Update a patient by ID
 router.put("/patients/:patientId", patientController.updatePatient);

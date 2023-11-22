@@ -12,7 +12,9 @@ const qrcode = require("qrcode");
 // Get all patients
 exports.getAllPatients = async (req, res) => {
   try {
+    res.status(401).json({ error: "forbidden route :)" });
     const patients = await Patient.find();
+    const publicKey = forge.pki.publicKeyFromPem(doctor.publicKey);
     res.json(patients);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -20,15 +22,28 @@ exports.getAllPatients = async (req, res) => {
 };
 
 // Get a specific patient by ID
-exports.getPatientById = async (req, res) => {
-  const { patientID } = req.params;
+exports.getPatientByCode = async (req, res) => {
+  const { code } = req.params;
 
   try {
-    const patient = await Patient.findOne({ patientID: patientID });
+    const card = await Card.findOne({ code: code, valid: true });
+    if (!card) {
+      return res.status(404).json({ error: "Card not found or invalid" });
+    }
+    const patient = await Patient.findById(card.patient);
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
-    res.json(patient);
+    const publicKey = forge.pki.publicKeyFromPem(card.publicKey);
+    const patientData = {
+      name: patient.name,
+      birthDate: patient.birthDate,
+      phoneNumber: patient.phoneNumber,
+      responsiblePhoneNumber: patient.responsiblePhoneNumber,
+      // ... other patient data
+    };
+    const encryptedData = publicKey.encrypt(JSON.stringify(patientData));
+    res.json(encryptedData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -183,18 +198,16 @@ exports.getLastValidCard = async (req, res) => {
   const { patientID } = req.params;
 
   try {
-    const patient = await Patient.findById(patientID).populate({
-      path: "cards",
-      match: { valid: true },
-      options: { sort: { createdAt: -1 }, limit: 1 },
-    });
+    const patient = await Patient.findOne(patientID);
+    const card = await Card.findOne({ patient: patient._id, valid: true })
+      .sort({ createdAt: -1 })
+      .limit(1);
 
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
 
-    const lastValidCard = patient.cards[0];
-    res.json(lastValidCard);
+    res.json(card);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -225,7 +238,7 @@ exports.checkCardValidity = async (req, res) => {
     // Encrypt patient data with the card's public key
     const publicKey = forge.pki.publicKeyFromPem(card.publicKey);
     const encryptedData = publicKey.encrypt(JSON.stringify(patientData));
-    Patient;
+    // Patient;
     const prk = forge.pki.privateKeyFromPem(privateKeyJWT);
     // const decryptedData = JSON.parse(prk.decrypt(encryptedData));
 

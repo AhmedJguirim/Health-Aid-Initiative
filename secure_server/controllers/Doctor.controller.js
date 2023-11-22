@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises; // for file reading
 const uuid = require("uuid");
+const forge = require("node-forge");
 
 const Doctor = require("../schemas/Doctor.schema");
 
@@ -17,7 +18,8 @@ exports.createDoctor = async (req, res) => {
       password: hashedPassword,
     });
     const savedDoctor = await newDoctor.save();
-    res.status(201).json(savedDoctor);
+
+    res.status(201).json({ message: "Doctor created successfully" });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal Server Error" });
@@ -64,11 +66,23 @@ exports.authenticateDoctor = async (req, res) => {
 // Controller to get details of a specific doctor
 exports.getDoctorDetails = async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({ doctorID: req.params.doctorID });
+    const doctor = await Doctor.findOne({
+      doctorID: req.params.doctorID,
+    }).select("-password");
+    const publicKey = forge.pki.publicKeyFromPem(doctor.publicKey);
+    const encryptedData = publicKey.encrypt(
+      JSON.stringify({
+        name: doctor.name,
+        email: doctor.email,
+        birthDate: doctor.birthDate,
+        phoneNumber: doctor.phoneNumber,
+        licenseNumber: doctor.licenseNumber,
+      })
+    );
     if (!doctor) {
       return res.status(404).json({ error: "Doctor not found" });
     }
-    res.json(doctor);
+    res.json(encryptedData);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal Server Error" });
