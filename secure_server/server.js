@@ -39,6 +39,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // app.use("/api/tests", testRouter);
 const patientRouter = require("./routes/Patient.router.js");
 app.use("/api", patientRouter);
+const doctorRouter = require("./routes/Doctor.router.js");
+app.use("/api", doctorRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);
