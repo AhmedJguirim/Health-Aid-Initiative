@@ -41,6 +41,10 @@ const patientRouter = require("./routes/Patient.router.js");
 app.use("/api", patientRouter);
 const doctorRouter = require("./routes/Doctor.router.js");
 app.use("/api", doctorRouter);
+const consentRouter = require("./routes/Consent.router.js");
+app.use("/api", consentRouter);
+const appointmentRouter = require("./routes/Appointment.router.js");
+app.use("/api/appointments", appointmentRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);

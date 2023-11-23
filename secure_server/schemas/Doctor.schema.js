@@ -37,6 +37,12 @@ const doctorSchema = new Schema({
     type: String, // Assuming the publicKey is a string
     required: true,
   },
+  specialities: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Speciality",
+    },
+  ],
 });
 
 const Doctor = mongoose.model("Doctor", doctorSchema);
