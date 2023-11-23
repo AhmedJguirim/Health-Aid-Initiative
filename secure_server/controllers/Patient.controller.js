@@ -215,7 +215,6 @@ exports.getLastValidCard = async (req, res) => {
 
 exports.checkCardValidity = async (req, res) => {
   const { code, pinCode } = req.body;
-
   try {
     const card = await Card.findOne({ code, pinCode, valid: true }).populate(
       "patient"
@@ -232,35 +231,21 @@ exports.checkCardValidity = async (req, res) => {
       responsiblePhoneNumber: card.patient.responsiblePhoneNumber,
       // ... other patient data
     };
-    const privateKeyJWT = fs.readFileSync("./keys/private_key.pem", "utf8");
+    // const privateKeyJWT = fs.readFileSync("./keys/private_key.pem", "utf8");
     // const publicKeyJWT = fs.readFileSync("./keys/public_key.pem", "utf8");
 
     // Encrypt patient data with the card's public key
     const publicKey = forge.pki.publicKeyFromPem(card.publicKey);
     const encryptedData = publicKey.encrypt(JSON.stringify(patientData));
     // Patient;
-    const prk = forge.pki.privateKeyFromPem(privateKeyJWT);
+    // const prk = forge.pki.privateKeyFromPem(privateKeyJWT);
     // const decryptedData = JSON.parse(prk.decrypt(encryptedData));
 
     // Generate JWT tokens
-    const accessToken = jwt.sign({ code: card.code }, privateKeyJWT, {
-      expiresIn: process.env.JWT_EXPIRATION,
-      algorithm: "RS256",
-    });
-
-    const refreshToken = jwt.sign(
-      { userId: card.code, tokenId: uuidv4() },
-      privateKeyJWT,
-      {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
-        algorithm: "RS256",
-      }
-    );
 
     // res.json({ accessToken, refreshToken, encryptedData, decryptedData });
-    res.json({ accessToken, refreshToken, encryptedData });
+    res.json({ encryptedData });
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 };

@@ -30,6 +30,7 @@ exports.createDoctor = async (req, res) => {
 exports.authenticateDoctor = async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(email);
     const doctor = await Doctor.findOne({ email });
 
     if (!doctor) {
@@ -45,18 +46,15 @@ exports.authenticateDoctor = async (req, res) => {
         .status(401)
         .json({ error: "Authentication failed. Invalid email or password." });
     }
+    const publicKey = await fs.readFile(
+      "keys/public_key_webServer.pem",
+      "utf8"
+    );
+    const pbkey = forge.pki.publicKeyFromPem(publicKey);
+    console.log(doctor.id);
+    const doctor_id = pbkey.encrypt(doctor.id);
 
-    const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
-    const accessToken = jwt.sign({ doctorID: doctor.doctorID }, privateKey, {
-      expiresIn: "15m",
-      algorithm: "RS256",
-    });
-    const refreshToken = jwt.sign({ doctorID: doctor.doctorID }, privateKey, {
-      expiresIn: "30d",
-      algorithm: "RS256",
-    });
-
-    res.json({ accessToken, refreshToken });
+    res.json({ doctor_id });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal Server Error" });
