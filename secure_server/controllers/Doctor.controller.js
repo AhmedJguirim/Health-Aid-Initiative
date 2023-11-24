@@ -25,6 +25,29 @@ exports.createDoctor = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+exports.createDoctorEncrypted = async (req, res) => {
+  try {
+    const doctorID = await generateUniqueDoctorId();
+    const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
+    const pvkey = forge.pki.privateKeyFromPem(privateKey);
+    const doctor = pvkey.decrypt(req.body.data);
+    doctor = JSON.parse(doctor);
+    console.log(doctor);
+    const hashedPassword = await bcrypt.hash(doctor.password, 10);
+    const newDoctor = new Doctor({
+      ...doctor,
+      publicKey: req.body.publicKey,
+      doctorID: doctorID,
+      password: hashedPassword,
+    });
+    const savedDoctor = await newDoctor.save();
+
+    res.status(201).json({ message: "Doctor created successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 // Controller to authenticate a doctor and return JWT tokens
 exports.authenticateDoctor = async (req, res) => {

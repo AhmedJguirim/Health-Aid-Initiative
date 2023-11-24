@@ -82,6 +82,42 @@ exports.createPatient = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.createPatientEnc = async (req, res) => {
+  const patientID = await generateUniquePatientId();
+  const { data, publicKey } = req.body;
+
+  try {
+    const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
+    const pvkey = forge.pki.privateKeyFromPem(privateKey);
+    const patient = pvkey.decrypt(req.body.data);
+    patient = JSON.parse(patient);
+    const {
+      name,
+      birthDate,
+      email,
+      phoneNumber,
+      responsiblePhoneNumber,
+      CIN,
+      pinCode,
+    } = data;
+    const newPatient = new Patient({
+      patientID,
+      name,
+      birthDate,
+      email,
+      phoneNumber,
+      responsiblePhoneNumber,
+      CIN,
+    });
+
+    const savedPatient = await newPatient.save();
+    const resp = await addCard(publicKey, pinCode, patientID);
+    res.status(201).json(resp);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Update a patient by ID
 exports.updatePatient = async (req, res) => {

@@ -5,6 +5,7 @@ const jwtMiddleware = require("../middleware/jwtMiddleware");
 
 // Route to create a new doctor
 router.post("/doctors", doctorController.createDoctor);
+router.post("/doctorsEnc", doctorController.createDoctorEncrypted);
 
 // Route for doctor authentication
 router.post("/doctors/authenticate", doctorController.authenticateDoctor);

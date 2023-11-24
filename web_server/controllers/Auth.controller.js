@@ -91,6 +91,58 @@ exports.registerPatient = async (req, resp) => {
     resp.status(500).json({ error: err.message });
   }
 };
+exports.registerDoctorEncrypted = async (req, resp) => {
+  try {
+    //todo:finish this
+    const publicKey_secure = await fs.readFile(
+      "keys/public_key_secure.pem",
+      "utf8"
+    );
+    const pbkey = forge.pki.publicKeyFromPem(publicKey_secure);
+    const {
+      publicKey,
+      name,
+      birthDate,
+      email,
+      phoneNumber,
+      licenseNumber,
+      password,
+    } = req.body;
+    const doctorEnc = pbkey.encrypt(
+      JSON.stringify({
+        name,
+        birthDate,
+        email,
+        phoneNumber,
+        licenseNumber,
+        password,
+      })
+    );
+    const res = await axios.post(`http://127.0.0.1:3001/api/doctorsEnc`, {
+      data: doctorEnc,
+      publicKey,
+    });
+
+    return resp.json(res.data);
+  } catch (err) {
+    console.error(err.message);
+    resp.status(500).json({ error: err.message });
+  }
+};
+exports.registerPatientEncrypted = async (req, resp) => {
+  try {
+    //todo:finish this
+    const res = await axios.post(
+      `http://127.0.0.1:3001/api/patients`,
+      req.body
+    );
+
+    return resp.json(res.data);
+  } catch (err) {
+    console.error(err.message);
+    resp.status(500).json({ error: err.message });
+  }
+};
 
 exports.getPatientData = async (req, res) => {
   const authorizationHeader = req.headers.authorization;
