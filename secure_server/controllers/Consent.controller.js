@@ -47,6 +47,52 @@ exports.getConsentDetails = async (req, res) => {
   }
 };
 
+exports.getConsentsOfDoc = async (req, res) => {
+  const { doctor } = req.query;
+  try {
+    const consents = await Consent.find({ doctor: doctor }); // Include only necessary patient fields
+    const patientIds = consents.map((consent) => consent.patient);
+
+    // Find patients using the extracted IDs
+    const patients = await Patient.find({ _id: { $in: patientIds } });
+    const patientInfo = patients.map((patient) => ({
+      id: patient._id,
+      name: patient.name,
+    }));
+    res.json(patientInfo);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getConsentOfdocPatient = async (req, res) => {
+  const { doctor, patient } = req.params;
+  console.log(req.body);
+  try {
+    const consent = await Consent.findOne({
+      doctor: doctor,
+      patient: patient,
+    }).populate("patient"); // Include only necessary patient fields
+    // Find patients using the extracted IDs
+    if (consent == null) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+
+    // Access the patient information (assuming it's already populated)
+    const patientID = consent.patient ? consent.patient.patientID : null;
+
+    // Check if patientID is null
+    if (patientID == null) {
+      return res.status(500).json({ error: "Patient ID not found" });
+    }
+    res.json(patientID);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Controller to update details of a specific consent
 exports.updateConsentDetails = async (req, res) => {
   try {

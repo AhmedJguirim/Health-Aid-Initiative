@@ -5,6 +5,12 @@ const consentController = require("../controllers/Consent.controller");
 // Route to create a new consent
 router.post("/consents", consentController.createConsent);
 
+router.get("/consents/doctor/:doctorId", consentController.getConsentsOfDoc);
+router.get(
+  "/consents/doctorPatient/:doctor/:patient",
+  consentController.getConsentOfdocPatient
+);
+
 // Route to get details of a specific consent
 router.get("/consents/:consentID", consentController.getConsentDetails);
 

@@ -64,9 +64,9 @@ exports.authenticateDoctor = async (req, res) => {
 // Controller to get details of a specific doctor
 exports.getDoctorDetails = async (req, res) => {
   try {
-    const doctor = await Doctor.findOne({
-      doctorID: req.params.doctorID,
-    }).select("-password");
+    const doctor = await Doctor.findById(req.params.doctorID).select(
+      "-password"
+    );
     const publicKey = forge.pki.publicKeyFromPem(doctor.publicKey);
     const encryptedData = publicKey.encrypt(
       JSON.stringify({

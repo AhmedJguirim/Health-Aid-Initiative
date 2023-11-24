@@ -6,5 +6,7 @@ router.post("/doctors/auth", authController.authenticateDoctor);
 router.post("/patients/auth", authController.authenticatePatient);
 router.post("/patients", authController.registerPatient);
 router.post("/doctors", authController.registerDoctor);
+router.get("/patients/data", authController.getPatientData);
+router.get("/doctors/data", authController.getDoctorData);
 
 module.exports = router;

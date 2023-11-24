@@ -17,7 +17,7 @@ router.post("/patients/checkCardValidity", patientController.checkCardValidity);
 // Get all patients
 router.get("/patients", patientController.getAllPatients);
 
-// Get a specific patient by ID
+// Get a specific patient by code
 router.get("/patients/:code", patientController.getPatientByCode);
 // Get a specific patient by ID
 router.get("/patients/lastCard/:patientId", patientController.getLastValidCard);
