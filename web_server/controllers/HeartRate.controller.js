@@ -61,6 +61,47 @@ exports.doctorGetPatientHeartRate = async (req, res) => {
   }
 };
 
+exports.patientGetHisHeartRates = async (req, res) => {
+  try {
+    const authorizationHeader = req.headers.authorization;
+    if (!authorizationHeader) {
+      // Handle the case where the JWT is not present in the headers
+      res.status(401).json({ error: "Unauthorized - JWT missing" });
+    }
+    // Extract the JWT token from the Authorization header
+    const token = authorizationHeader.replace("Bearer ", "");
+    const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
+    jwt.verify(token, privateKey, async (err, decoded) => {
+      try {
+        if (err) {
+          // Handle the case where the JWT verification fails
+          res.status(401).json({ error: err.message });
+        } else {
+          console.log(decoded.code);
+          const resp = await axios.get(
+            `http://127.0.0.1:3001/api/patients/ID/${decoded.code}`
+          );
+          if (!resp.data) {
+            res.status(401).json({ error: "Unauthorized" });
+          }
+          // const heartrates = HeartRate.find({ patientID });
+          // Continue processing the request
+          console.log(resp.data);
+          const resp1 = await HeartRate.find({
+            patientID: resp.data.patientID,
+          });
+
+          res.json(resp1);
+        }
+      } catch (err) {
+        res.status(500).json({ error: err.message });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getAllHeartRates = async (req, res) => {
   const { patient } = req.params;
 

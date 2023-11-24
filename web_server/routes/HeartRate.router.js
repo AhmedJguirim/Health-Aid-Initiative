@@ -9,15 +9,17 @@ const heartRateController = require("../controllers/HeartRate.controller");
 router.post("/heartRates", heartRateController.createHeartRate);
 
 // Get all heart rates for a specific patient
-router.get(
-  "/patients/:patientID/heartRates",
-  heartRateController.getAllHeartRates
-);
-// Get all heart rates for a specific patient (the real one)
+// router.get(
+//   "/patients/:patientID/heartRates",
+//   heartRateController.getAllHeartRates
+// );
+// Get all heart rates for a specific patient as a doctor(the real one)
 router.get(
   "/doctors/:patient/heartRates",
   heartRateController.doctorGetPatientHeartRate
 );
+// a patient gets his heartrates
+router.get("/patients/heartRates", heartRateController.patientGetHisHeartRates);
 
 // Get a specific heart rate by ID
 router.get("/heartRates/:heartRateId", heartRateController.getHeartRateById);

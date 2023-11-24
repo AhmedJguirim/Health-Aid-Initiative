@@ -316,3 +316,20 @@ const generateUniqueCode = async () => {
 
   return code;
 };
+
+exports.getPatientIDByCode = async (req, res) => {
+  const { code } = req.params;
+  try {
+    const card = await Card.findOne({ code: code, valid: true });
+    if (!card) {
+      return res.status(404).json({ error: "Card not found or invalid" });
+    }
+    const patient = await Patient.findById(card.patient);
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+    res.json({ patientID: patient.patientID });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

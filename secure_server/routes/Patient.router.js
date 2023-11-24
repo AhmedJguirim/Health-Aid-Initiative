@@ -20,6 +20,7 @@ router.get("/patients", patientController.getAllPatients);
 
 // Get a specific patient by code
 router.get("/patients/:code", patientController.getPatientByCode);
+router.get("/patients/ID/:code", patientController.getPatientIDByCode);
 // Get a specific patient by ID
 router.get("/patients/lastCard/:patientId", patientController.getLastValidCard);
 

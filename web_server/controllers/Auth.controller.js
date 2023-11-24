@@ -15,7 +15,7 @@ exports.authenticateDoctor = async (req, resp) => {
 
       const doctor_id = pkey.decrypt(res.data.doctor_id);
       const accessToken = jwt.sign({ doctor_id: doctor_id }, privateKey, {
-        expiresIn: "15m",
+        expiresIn: "30d",
         algorithm: "RS256",
       });
       const refreshToken = jwt.sign({ doctor_id: doctor_id }, privateKey, {
@@ -42,7 +42,7 @@ exports.authenticatePatient = async (req, resp) => {
 
     const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
     const accessToken = jwt.sign({ code: req.body.code }, privateKey, {
-      expiresIn: process.env.JWT_EXPIRATION,
+      expiresIn: "30d",
       algorithm: "RS256",
     });
 
@@ -53,7 +53,7 @@ exports.authenticatePatient = async (req, resp) => {
       },
       privateKey,
       {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRATION,
+        expiresIn: "30d",
         algorithm: "RS256",
       }
     );
