@@ -40,6 +40,8 @@ const heartRateRouter = require("./routes/HeartRate.router.js");
 app.use("/api", heartRateRouter);
 const authRouter = require("./routes/Auth.router.js");
 app.use("/api", authRouter);
+const medicineRouter = require("./routes/Medicine.router.js");
+app.use("/api", medicineRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);
