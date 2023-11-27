@@ -117,7 +117,7 @@ exports.getConsentOfdocPatientAdd = async (req, res) => {
     if (!patientID) {
       return res.status(500).json({ error: "Patient ID not found" });
     }
-    res.json({ patientID, doctorID });
+    res.json({ patientID, doctorID, doctorName: consent.doctor.name });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });

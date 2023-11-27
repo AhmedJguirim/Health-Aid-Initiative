@@ -19,6 +19,10 @@ const dosageSchema = new mongoose.Schema({
     ref: "MedListing",
     required: true,
   },
+  doctorName: {
+    type: String,
+    required: true,
+  },
   alarms: [{ type: mongoose.Schema.Types.ObjectId, ref: "Alarm" }],
 });
 

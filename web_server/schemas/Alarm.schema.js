@@ -18,6 +18,14 @@ const alarmSchema = new mongoose.Schema({
     ref: "Dosage",
     required: true,
   },
+  patientID: {
+    type: String,
+    required: true,
+  },
+  medicineName: {
+    type: String,
+    required: true,
+  },
 });
 
 const Alarm = mongoose.model("Alarm", alarmSchema);

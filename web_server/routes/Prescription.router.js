@@ -8,5 +8,6 @@ router.post(
   "/prescriptions/:patient",
   PrescriptionController.createPrescription
 );
+router.get("/dailyMedicines", PrescriptionController.getTodaysMedecine);
 
 module.exports = router;

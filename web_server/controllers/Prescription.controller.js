@@ -42,7 +42,9 @@ exports.createPrescription = async (req, res) => {
 
     // Loop through each medListing in the request
     for (const medListingData of medListings) {
-      const { medecineId, numberOfDays, critical, dosage } = medListingData;
+      const { medecineId, numberOfDays, critical, dosage, medicineName } =
+        medListingData;
+      console.log(medicineName);
 
       // Create a new medListing
       const medListing = new MedListing({
@@ -66,6 +68,7 @@ exports.createPrescription = async (req, res) => {
           quantity,
           timeOfDay: time,
           medListing: savedMedListing._id,
+          doctorName: resp.data.doctorName,
         });
 
         // Save the dosage
@@ -87,9 +90,11 @@ exports.createPrescription = async (req, res) => {
 
           // Create a new alarm
           const alarm = new Alarm({
-            title: `Dose for ${savedMedListing.medicine.name} ${time} dose`,
+            title: `Dose for ${medicineName} ${time} dose`,
             dateTime: alarmDatetime,
             dosage: savedDosage._id,
+            patientID: resp.data.patientID,
+            medicineName: medicineName,
           });
 
           // Save the alarm
@@ -114,6 +119,34 @@ exports.createPrescription = async (req, res) => {
       dosages: createdDosages,
       alarms: createdAlarms,
     });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.getTodaysMedecine = async (req, res) => {
+  try {
+    // Verify the doctor's JWT
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+    // Check if the doctor has the right to create a prescription for the specified patient
+    const resp = await axios.get(
+      `http://127.0.0.1:3001/api/patients/ID/${decodedJwt.code}`
+    );
+    if (!resp) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const currentDate = new Date().toISOString().split("T")[0];
+    const dosages = await Alarm.find({
+      patientID: resp.data.patientID,
+      dateTime: {
+        $gte: new Date(currentDate), // Greater than or equal to the start of today
+        $lt: new Date(currentDate + "T23:59:59"), // Less than the end of today
+      },
+    }).populate("dosage");
+    const dosageIds = dosages.map((alarm) => alarm.dosage._id);
+
+    res.json(dosages);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal Server Error" });
