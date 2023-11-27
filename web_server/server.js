@@ -42,6 +42,8 @@ const authRouter = require("./routes/Auth.router.js");
 app.use("/api", authRouter);
 const medicineRouter = require("./routes/Medicine.router.js");
 app.use("/api", medicineRouter);
+const prescriptionRouter = require("./routes/Prescription.router.js");
+app.use("/api", prescriptionRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);

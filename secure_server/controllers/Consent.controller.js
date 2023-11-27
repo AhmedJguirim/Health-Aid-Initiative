@@ -93,6 +93,37 @@ exports.getConsentOfdocPatient = async (req, res) => {
   }
 };
 
+exports.getConsentOfdocPatientAdd = async (req, res) => {
+  const { doctor, patient } = req.params;
+  console.log(req.body);
+  try {
+    const consent = await Consent.findOne({
+      doctor: doctor,
+      patient: patient,
+      add: true,
+    })
+      .populate("patient")
+      .populate("doctor"); // Include only necessary patient fields
+    // Find patients using the extracted IDs
+    if (!consent) {
+      return res.status(401).json({ error: "unauthorized" });
+    }
+
+    // Access the patient information (assuming it's already populated)
+    const patientID = consent.patient ? consent.patient.patientID : null;
+    const doctorID = consent.doctor ? consent.doctor.doctorID : null;
+
+    // Check if patientID is null
+    if (!patientID) {
+      return res.status(500).json({ error: "Patient ID not found" });
+    }
+    res.json({ patientID, doctorID });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // Controller to update details of a specific consent
 exports.updateConsentDetails = async (req, res) => {
   try {

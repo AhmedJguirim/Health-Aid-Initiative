@@ -10,6 +10,10 @@ router.get(
   "/consents/doctorPatient/:doctor/:patient",
   consentController.getConsentOfdocPatient
 );
+router.get(
+  "/consents/doctorPatient/add/:doctor/:patient",
+  consentController.getConsentOfdocPatientAdd
+);
 
 // Route to get details of a specific consent
 router.get("/consents/:consentID", consentController.getConsentDetails);
