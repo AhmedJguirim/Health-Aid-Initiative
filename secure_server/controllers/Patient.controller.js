@@ -8,6 +8,7 @@ const forge = require("node-forge");
 const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const qrcode = require("qrcode");
+const Address = require("../schemas/Address.schema");
 
 // Get all patients
 exports.getAllPatients = async (req, res) => {
@@ -30,7 +31,7 @@ exports.getPatientByCode = async (req, res) => {
     if (!card) {
       return res.status(404).json({ error: "Card not found or invalid" });
     }
-    const patient = await Patient.findById(card.patient);
+    const patient = await Patient.findById(card.patient).populate("addresses");
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" });
     }
@@ -40,11 +41,17 @@ exports.getPatientByCode = async (req, res) => {
       birthDate: patient.birthDate,
       phoneNumber: patient.phoneNumber,
       responsiblePhoneNumber: patient.responsiblePhoneNumber,
+      bloodType: patient.bloodType,
+      sex: patient.sex,
       // ... other patient data
     };
     const encryptedData = publicKey.encrypt(JSON.stringify(patientData));
-    res.json(encryptedData);
+    const encryptedAdderess = publicKey.encrypt(
+      JSON.stringify(patient.addresses[0])
+    );
+    res.json({ patientData: encryptedData, address: encryptedAdderess });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 };
@@ -99,6 +106,8 @@ exports.createPatientEnc = async (req, res) => {
       responsiblePhoneNumber,
       CIN,
       pinCode,
+      bloodType,
+      sex,
     } = data;
     const newPatient = new Patient({
       patientID,
@@ -108,9 +117,11 @@ exports.createPatientEnc = async (req, res) => {
       phoneNumber,
       responsiblePhoneNumber,
       CIN,
+      sex,
+      bloodType,
     });
 
-    const savedPatient = await newPatient.save();
+    await newPatient.save();
     const resp = await addCard(publicKey, pinCode, patientID);
     res.status(201).json(resp);
   } catch (error) {
@@ -119,6 +130,50 @@ exports.createPatientEnc = async (req, res) => {
   }
 };
 
+exports.addAddressToPatient = async (req, res) => {
+  const { patientID, country, city, street, zipcode } = req.body;
+
+  try {
+    const patient = await Patient.findOne({ patientID: patientID });
+    if (!patient) {
+      return res.status(401).json({ error: "Unautherized" });
+    }
+    const address = new Address({
+      country: country,
+      city: city,
+      street: street,
+      zipcode: zipcode,
+      patient: patient._id,
+    });
+    const savedAddress = await address.save();
+    patient.addresses.push(savedAddress._id);
+    await patient.save();
+
+    res.json(savedAddress);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.updatePatient = async (req, res) => {
+  const { patientID } = req.params;
+  const updateFields = req.body;
+
+  try {
+    const updatedPatient = await Patient.findOneAndUpdate(
+      { patientID: patientID },
+      updateFields,
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+
+    res.json(updatedPatient);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 // Update a patient by ID
 exports.updatePatient = async (req, res) => {
   const { patientID } = req.params;

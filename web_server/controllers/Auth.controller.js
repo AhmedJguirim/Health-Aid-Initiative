@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs").promises; // for file reading
 const axios = require("axios");
 const forge = require("node-forge");
+const { verifyJwt } = require("../utils/auth");
 
 exports.authenticateDoctor = async (req, resp) => {
   axios
@@ -85,6 +86,28 @@ exports.registerPatient = async (req, resp) => {
       req.body
     );
 
+    return resp.json(res.data);
+  } catch (err) {
+    console.error(err.message);
+    resp.status(500).json({ error: err.message });
+  }
+};
+
+exports.addAddressToPatient = async (req, resp) => {
+  const { code, country, city, street, zipcode } = req.body;
+  try {
+    //todo: you can incript from front with public key of secure server and send it fully secure
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+    const pID = await axios.get(
+      `http://127.0.0.1:3001/api/patients/ID/${decodedJwt.code}`
+    );
+    const res = await axios.post(`http://127.0.0.1:3001/api/addresses`, {
+      patientID: pID.data.patientID,
+      country,
+      city,
+      street,
+      zipcode,
+    });
     return resp.json(res.data);
   } catch (err) {
     console.error(err.message);

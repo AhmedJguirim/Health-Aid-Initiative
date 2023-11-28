@@ -4,6 +4,7 @@ const authController = require("../controllers/Auth.controller");
 
 router.post("/doctors/auth", authController.authenticateDoctor);
 router.post("/patients/auth", authController.authenticatePatient);
+router.post("/patients/addAddress", authController.addAddressToPatient);
 //don't use these 2
 router.post("/patients", authController.registerPatient);
 router.post("/doctors", authController.registerDoctor);

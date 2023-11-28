@@ -2,13 +2,6 @@
 
 const mongoose = require("mongoose");
 
-const addressSchema = new mongoose.Schema({
-  street: String,
-  city: String,
-  state: String,
-  postalCode: String,
-});
-
 const patientSchema = new mongoose.Schema({
   patientID: {
     type: String,
@@ -36,13 +29,22 @@ const patientSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  sex: {
+    type: String,
+    required: true,
+  },
   CIN: {
     type: String,
     required: true,
     unique: true,
   },
+
+  bloodType: {
+    type: String,
+    required: true,
+  },
+  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
   cards: [{ type: mongoose.Schema.Types.ObjectId, ref: "Card" }],
-  addresses: [addressSchema],
 });
 
 const Patient = mongoose.model("Patient", patientSchema);

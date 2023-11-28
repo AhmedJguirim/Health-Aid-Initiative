@@ -9,5 +9,6 @@ router.post(
   PrescriptionController.createPrescription
 );
 router.get("/dailyMedicines", PrescriptionController.getTodaysMedecine);
+router.put("/setAsTaken/:dosage", PrescriptionController.setMedecineAsTaken);
 
 module.exports = router;

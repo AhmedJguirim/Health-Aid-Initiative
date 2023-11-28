@@ -8,6 +8,7 @@ const jwtMiddleware = require("../middleware/jwtMiddleware");
 // Create a new patient
 router.post("/patients", patientController.createPatient);
 router.post("/patientsEnc", patientController.createPatientEnc);
+router.post("/addresses", patientController.addAddressToPatient);
 
 // Check if provided code and pinCode match a valid card
 router.post("/patients/checkCardValidity", patientController.checkCardValidity);
