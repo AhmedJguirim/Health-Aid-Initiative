@@ -1,14 +1,14 @@
-// controllers/heartRateController.js
+// controllers/bloodPressureController.js
 
 const { default: axios } = require("axios");
-const HeartRate = require("../schemas/HeartRate.schema");
+const BloodPressure = require("../schemas/BloodPressure.schema");
 const jwt = require("jsonwebtoken");
 const fs = require("fs").promises; // for file reading
 const { verifyJwt } = require("../utils/auth");
 
 // Create a new heart rate entry
-exports.createHeartRate = async (req, res) => {
-  const { value, patientID } = req.body;
+exports.createBloodPressure = async (req, res) => {
+  const { systolic, diastolic } = req.body;
   const decodedJwt = await verifyJwt(req.headers.authorization);
   const pID = await axios.get(
     `http://127.0.0.1:3001/api/patients/ID/${decodedJwt.code}`
@@ -17,20 +17,21 @@ exports.createHeartRate = async (req, res) => {
     return res.status(404).json({ error: "Not found: card not found" });
   }
   try {
-    const newHeartRate = new HeartRate({
-      value,
+    const newBloodPressure = new BloodPressure({
+      systolic,
+      diastolic,
       patientID: pID.data.patientID,
     });
-    const savedHeartRate = await newHeartRate.save();
+    const savedBloodPressure = await newBloodPressure.save();
 
-    res.status(201).json(savedHeartRate);
+    res.status(201).json(savedBloodPressure);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // Get all heart rates for a specific patient
-exports.doctorGetPatientHeartRate = async (req, res) => {
+exports.doctorGetPatientBloodPressure = async (req, res) => {
   const { patient } = req.params;
 
   try {
@@ -55,10 +56,10 @@ exports.doctorGetPatientHeartRate = async (req, res) => {
           if (!resp.data) {
             res.status(401).json({ error: "Unauthorized" });
           }
-          // const heartrates = HeartRate.find({ patientID });
+          // const heartrates = BloodPressure.find({ patientID });
           // Continue processing the request
           console.log(resp.data);
-          const resp1 = await HeartRate.find({ patientID: resp.data });
+          const resp1 = await BloodPressure.find({ patientID: resp.data });
 
           res.json(resp1);
         }
@@ -71,7 +72,7 @@ exports.doctorGetPatientHeartRate = async (req, res) => {
   }
 };
 
-exports.patientGetHisHeartRates = async (req, res) => {
+exports.patientGetHisBloodPressures = async (req, res) => {
   try {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
@@ -94,10 +95,10 @@ exports.patientGetHisHeartRates = async (req, res) => {
           if (!resp.data) {
             res.status(401).json({ error: "Unauthorized" });
           }
-          // const heartrates = HeartRate.find({ patientID });
+          // const heartrates = BloodPressure.find({ patientID });
           // Continue processing the request
           console.log(resp.data);
-          const resp1 = await HeartRate.find({
+          const resp1 = await BloodPressure.find({
             patientID: resp.data.patientID,
           });
 
@@ -112,67 +113,69 @@ exports.patientGetHisHeartRates = async (req, res) => {
   }
 };
 
-exports.getAllHeartRates = async (req, res) => {
+exports.getAllBloodPressures = async (req, res) => {
   const { patient } = req.params;
 
   try {
-    const heartRates = await HeartRate.find({ patient });
-    res.json(heartRates);
+    const bloodPressures = await BloodPressure.find({ patient });
+    res.json(bloodPressures);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // Get a specific heart rate by ID
-exports.getHeartRateById = async (req, res) => {
-  const { heartRateId } = req.params;
+exports.getBloodPressureById = async (req, res) => {
+  const { bloodPressureId } = req.params;
 
   try {
-    const heartRate = await HeartRate.findById(heartRateId);
-    if (!heartRate) {
+    const bloodPressure = await BloodPressure.findById(bloodPressureId);
+    if (!bloodPressure) {
       return res.status(404).json({ error: "Heart rate not found" });
     }
 
-    res.json(heartRate);
+    res.json(bloodPressure);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // Update a heart rate by ID
-exports.updateHeartRate = async (req, res) => {
-  const { heartRateId } = req.params;
+exports.updateBloodPressure = async (req, res) => {
+  const { bloodPressureId } = req.params;
   const updateFields = req.body;
 
   try {
-    const updatedHeartRate = await HeartRate.findByIdAndUpdate(
-      heartRateId,
+    const updatedBloodPressure = await BloodPressure.findByIdAndUpdate(
+      bloodPressureId,
       updateFields,
       { new: true }
     );
 
-    if (!updatedHeartRate) {
+    if (!updatedBloodPressure) {
       return res.status(404).json({ error: "Heart rate not found" });
     }
 
-    res.json(updatedHeartRate);
+    res.json(updatedBloodPressure);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
 // Delete a heart rate by ID
-exports.deleteHeartRate = async (req, res) => {
-  const { heartRateId } = req.params;
+exports.deleteBloodPressure = async (req, res) => {
+  const { bloodPressureId } = req.params;
 
   try {
-    const deletedHeartRate = await HeartRate.findByIdAndDelete(heartRateId);
+    const deletedBloodPressure = await BloodPressure.findByIdAndDelete(
+      bloodPressureId
+    );
 
-    if (!deletedHeartRate) {
+    if (!deletedBloodPressure) {
       return res.status(404).json({ error: "Heart rate not found" });
     }
 
-    res.json(deletedHeartRate);
+    res.json(deletedBloodPressure);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

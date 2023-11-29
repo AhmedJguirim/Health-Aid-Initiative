@@ -101,6 +101,9 @@ exports.addAddressToPatient = async (req, resp) => {
     const pID = await axios.get(
       `http://127.0.0.1:3001/api/patients/ID/${decodedJwt.code}`
     );
+    if (!pID) {
+      return res.status(404).json({ error: "Not found: card not found" });
+    }
     const res = await axios.post(`http://127.0.0.1:3001/api/addresses`, {
       patientID: pID.data.patientID,
       country,

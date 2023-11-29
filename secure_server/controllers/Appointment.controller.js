@@ -1,11 +1,18 @@
 const Appointment = require("../schemas/Appointment.schema");
 const uuid = require("uuid");
+const forge = require("node-forge");
+const fs = require("fs").promises; // for file reading
 
 exports.createAppointment = async (req, res) => {
   try {
     // Assuming you have the doctor and patient instances available
     const { doctor, patient, ...appointmentData } = req.body;
     const appointmentID = await generateUniqueAppointmentId();
+    const publicKey = await fs.readFile(
+      "keys/public_key_webServer.pem",
+      "utf8"
+    );
+    const pbkey = forge.pki.publicKeyFromPem(publicKey);
 
     const newAppointment = new Appointment({
       doctor: doctor,
@@ -15,11 +22,11 @@ exports.createAppointment = async (req, res) => {
     });
 
     await newAppointment.save();
-
-    res.status(201).json(newAppointment);
+    const IDEnc = pbkey.encrypt(appointmentID);
+    res.status(201).json({ appointmentID: IDEnc });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: error.message });
   }
 };
 

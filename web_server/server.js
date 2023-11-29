@@ -46,6 +46,12 @@ const prescriptionRouter = require("./routes/Prescription.router.js");
 app.use("/api", prescriptionRouter);
 const allergieRouter = require("./routes/Allergie.router.js");
 app.use("/api", allergieRouter);
+const bloodPressureRouter = require("./routes/BloodPressure.router.js");
+app.use("/api", bloodPressureRouter);
+const spo2Router = require("./routes/Spo2.router.js");
+app.use("/api", spo2Router);
+const diagnosisRouter = require("./routes/Diagnosis.router.js");
+app.use("/api", diagnosisRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);
