@@ -341,6 +341,33 @@ exports.checkCardValidity = async (req, res) => {
   }
 };
 
+const Consent = require("../schemas/Consent.schema");
+exports.searchPatientByName = async (req, res) => {
+  try {
+    const consents = await Consent.find({
+      doctor: req.query.doctor,
+    });
+    console.log(req.query.doctor);
+    const patientIds = consents.map((consent) => consent.patient);
+    const patients = await Patient.find({
+      name: { $regex: req.query.name, $options: "i" },
+      _id: { $in: patientIds },
+    })
+      .select("name birthDate phoneNumber sex addresses")
+      .populate("addresses");
+    if (patients == []) {
+      return res.status(404).json({ error: "Patient not found" });
+    }
+
+    res.json({
+      patients,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 const generateUniquePatientId = async () => {
   let patientID;
   do {

@@ -15,4 +15,8 @@ router.post("/patientsEnc", authController.registerPatientEncrypted);
 router.get("/patients/data", authController.getPatientData);
 router.get("/doctors/data", authController.getDoctorData);
 
+router.get("/doctors/searchPatients", authController.searchMyPatientsByName);
+
+router.post("/doctor/speciality", authController.addSpecialityToDoctor);
+
 module.exports = router;

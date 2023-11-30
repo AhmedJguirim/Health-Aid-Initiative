@@ -25,5 +25,6 @@ router.delete("/doctors/:doctorID", doctorController.deleteDoctor);
 router.post("/doctor/speciality", doctorController.addSpecialityToDoctor);
 router.post("/speciality", doctorController.addSpeciality);
 router.get("/doctor/search", doctorController.searchDoctorByName);
+router.get("/doctor/search/email", doctorController.searchDoctorByEmail);
 
 module.exports = router;

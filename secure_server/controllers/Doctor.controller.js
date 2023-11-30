@@ -189,6 +189,26 @@ exports.searchDoctorByName = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+exports.searchDoctorByEmail = async (req, res) => {
+  console.log(req.query.email);
+  try {
+    const doctors = await Doctor.find({
+      email: { $regex: req.query.email, $options: "i" },
+    })
+      .populate("specialities")
+      .select("name specitialities");
+    if (doctors == []) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    res.json({
+      doctors,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 exports.addSpeciality = async (req, res) => {
   try {
@@ -207,6 +227,7 @@ exports.addSpeciality = async (req, res) => {
 };
 exports.addSpecialityToDoctor = async (req, res) => {
   try {
+    console.log("error.message");
     const doctor = await Doctor.findById(req.body.doctorId);
     if (!doctor) {
       return res.status(404).json({ message: "Doctor not found." });
@@ -226,6 +247,7 @@ exports.addSpecialityToDoctor = async (req, res) => {
 
     res.status(200).json({ message: "Speciality added successfully." });
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 };

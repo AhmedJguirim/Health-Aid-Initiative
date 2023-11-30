@@ -269,3 +269,63 @@ exports.searchDoctorsByName = async (req, res) => {
     }
   });
 };
+
+exports.searchMyPatientsByName = async (req, res) => {
+  const authorizationHeader = req.headers.authorization;
+  console.log(authorizationHeader);
+  if (!authorizationHeader) {
+    // Handle the case where the JWT is not present in the headers
+    res.status(401).json({ error: "Unauthorized - JWT missing" });
+  }
+  // Extract the JWT token from the Authorization header
+  const token = authorizationHeader.replace("Bearer ", "");
+  const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
+  jwt.verify(token, privateKey, async (err, decoded) => {
+    try {
+      if (err) {
+        // Handle the case where the JWT verification fails
+        res.status(401).json({ error: err.message });
+      } else {
+        const resp = await axios.get(
+          `http://127.0.0.1:3001/api/patients/search?name=${req.query.name}&doctor=${decoded.doctor_id}`
+        );
+        if (!resp.data) {
+          res.status(401).json({ error: "Unauthorized" });
+        }
+
+        res.json(resp.data);
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+};
+
+exports.addSpecialityToDoctor = async (req, res) => {
+  const authorizationHeader = req.headers.authorization;
+  if (!authorizationHeader) {
+    // Handle the case where the JWT is not present in the headers
+    res.status(401).json({ error: "Unauthorized - JWT missing" });
+  }
+  // Extract the JWT token from the Authorization header
+  const token = authorizationHeader.replace("Bearer ", "");
+  const privateKey = await fs.readFile("keys/private_key.pem", "utf8");
+  jwt.verify(token, privateKey, async (err, decoded) => {
+    try {
+      if (err) {
+        // Handle the case where the JWT verification fails
+        res.status(401).json({ error: err.message });
+      } else {
+        await axios.post(`http://127.0.0.1:3001/api/doctor/speciality`, {
+          doctorId: decoded.doctor_id,
+          specialityId: req.body.specialityId,
+        });
+        // const heartrates = HeartRate.find({ patientID });
+        // Continue processing the request
+        res.json({ message: "speciality added successfully" });
+      }
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+};

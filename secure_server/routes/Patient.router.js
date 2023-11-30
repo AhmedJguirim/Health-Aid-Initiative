@@ -18,6 +18,7 @@ router.post("/patients/checkCardValidity", patientController.checkCardValidity);
 
 // Get all patients
 router.get("/patients", patientController.getAllPatients);
+router.get("/patients/search", patientController.searchPatientByName);
 
 // Get a specific patient by code
 router.get("/patients/:code", patientController.getPatientByCode);
