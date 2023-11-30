@@ -5,6 +5,7 @@ const uuid = require("uuid");
 const forge = require("node-forge");
 
 const Doctor = require("../schemas/Doctor.schema");
+const Speciality = require("../schemas/Speciality.schema");
 
 // Controller to create a new doctor
 exports.createDoctor = async (req, res) => {
@@ -150,6 +151,82 @@ exports.deleteDoctor = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+exports.searchDoctorByName = async (req, res) => {
+  try {
+    const doctor = await Doctor.find({
+      name: { $regex: req.query.name, $options: "i" },
+    }).populate("speciality");
+
+    if (!doctor) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    res.json({ doctor });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+exports.searchDoctorByName = async (req, res) => {
+  console.log(req.query.name);
+  try {
+    const doctors = await Doctor.find({
+      name: { $regex: req.query.name, $options: "i" },
+    })
+      .populate("specialities")
+      .select("name specitialities");
+    if (doctors == []) {
+      return res.status(404).json({ error: "Doctor not found" });
+    }
+
+    res.json({
+      doctors,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+exports.addSpeciality = async (req, res) => {
+  try {
+    const speciality = new Speciality({
+      name: req.body.name,
+      description: req.body.description,
+    });
+    const savedSpeciality = await speciality.save();
+    res.json({ id: savedSpeciality._id });
+  } catch (error) {
+    console.log(error.message);
+    res
+      .status(500)
+      .json({ message: "There was an error adding the speciality." });
+  }
+};
+exports.addSpecialityToDoctor = async (req, res) => {
+  try {
+    const doctor = await Doctor.findById(req.body.doctorId);
+    if (!doctor) {
+      return res.status(404).json({ message: "Doctor not found." });
+    }
+    console.log(doctor._id);
+    const speciality = await Speciality.findById(req.body.specialityId);
+    if (!speciality) {
+      return res.status(404).json({ message: "Speciality not found." });
+    }
+    console.log(speciality._id);
+    if (doctor.specialities.includes(req.body.specialityId)) {
+      return res.status(400).json({ message: "Speciality already exists." });
+    }
+
+    doctor.specialities.push(speciality._id);
+    await doctor.save();
+
+    res.status(200).json({ message: "Speciality added successfully." });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -22,4 +22,8 @@ router.put("/doctors/:doctorID", doctorController.updateDoctorDetails);
 // Route to delete a specific doctor
 router.delete("/doctors/:doctorID", doctorController.deleteDoctor);
 
+router.post("/doctor/speciality", doctorController.addSpecialityToDoctor);
+router.post("/speciality", doctorController.addSpeciality);
+router.get("/doctor/search", doctorController.searchDoctorByName);
+
 module.exports = router;
