@@ -52,6 +52,8 @@ const spo2Router = require("./routes/Spo2.router.js");
 app.use("/api", spo2Router);
 const diagnosisRouter = require("./routes/Diagnosis.router.js");
 app.use("/api", diagnosisRouter);
+const notificationRouter = require("./routes/Notification.router.js");
+app.use("/api", notificationRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);
