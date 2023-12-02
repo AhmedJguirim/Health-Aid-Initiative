@@ -10,6 +10,10 @@ router.get("/:appointmentID", appointmentController.getAppointmentDetails);
 
 // Get all appointments for a specific doctor
 router.get("/doctor/:doctorID", appointmentController.getAppointmentsByDoctor);
+router.get(
+  "/doctor/:doctor/Patient/:patientID",
+  appointmentController.getAppointmentsOfPatientByDoctor
+);
 
 // Get all appointments for a specific patient
 router.get(

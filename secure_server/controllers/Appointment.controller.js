@@ -61,6 +61,29 @@ exports.getAppointmentsByDoctor = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const Patient = require("../schemas/Patient.schema");
+const Doctor = require("../schemas/Doctor.schema");
+exports.getAppointmentsOfPatientByDoctor = async (req, res) => {
+  try {
+    const doctor = await Doctor.findOne({ _id: req.params.doctor });
+
+    const patient = await Patient.findOne({
+      patientID: req.params.patientID,
+    }).select("-addresses -cards -responsiblePhoneNumber");
+    const appointments = await Appointment.find({
+      patient: patient._id,
+    });
+    console.log(patient);
+    const publicKey = forge.pki.publicKeyFromPem(doctor.publicKey);
+    // const encryptedData = publicKey.encrypt(JSON.stringify(patient));
+
+    // res.json({ appointments, patient: encryptedData });
+    res.json({ appointments, patient: patient });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 exports.getAppointmentsByPatient = async (req, res) => {
   try {

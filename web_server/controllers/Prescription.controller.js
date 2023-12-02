@@ -44,7 +44,6 @@ exports.createPrescription = async (req, res) => {
     for (const medListingData of medListings) {
       const { medecineId, numberOfDays, critical, dosage, medicineName } =
         medListingData;
-      console.log(medicineName);
 
       // Create a new medListing
       const medListing = new MedListing({

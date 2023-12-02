@@ -29,7 +29,6 @@ exports.getHighlightedPatients = async (req, res) => {
     const highlightedPatients = await Highlight.find({
       doctor: req.query.doctor,
     }).populate("patient", "name patientID phoneNumber");
-    s;
 
     return res.status(200).json({ highlightedPatients: highlightedPatients });
   } catch (error) {

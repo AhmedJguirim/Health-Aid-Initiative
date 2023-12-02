@@ -11,12 +11,10 @@ const forge = require("node-forge");
 
 exports.createDiagnosis = async (req, res) => {
   const { notes, diseasesCaught, allergiesCaught, patient } = req.body;
-  console.log(patient);
 
   try {
     // Verify the doctor's JWT
     const decodedJwt = await verifyJwt(req.headers.authorization);
-    console.log(decodedJwt.doctor_id);
     // Check if the doctor has the right to create a prescription for the specified patient
     const resp = await axios.get(
       `http://127.0.0.1:3001/api/consents/doctorPatient/add/${decodedJwt.doctor_id}/${patient}`
@@ -77,6 +75,50 @@ exports.createDiagnosis = async (req, res) => {
     // Response with created data
     res.status(201).json({
       message: "nice",
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+const Prescription = require("../schemas/Prescription.schema");
+const MedListing = require("../schemas/MedListing.schema");
+exports.doctorGetPatientDiagnosis = async (req, res) => {
+  try {
+    // Verify the doctor's JWT
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+    // Check if the doctor has the right to create a prescription for the specified patient
+    const resp = await axios.get(
+      `http://127.0.0.1:3001/api/consents/doctorPatient/${decodedJwt.doctor_id}/${req.query.patient}`
+    );
+    if (!resp) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const apps = await axios.get(
+      `http://127.0.0.1:3001/api/appointments/doctor/${decodedJwt.doctor_id}/Patient/${resp.data}`
+    );
+    const prescriptions = await Prescription.find({
+      patientID: resp.data,
+    });
+    const medListingsId = prescriptions.flatMap(
+      (appointment) => appointment.medListings
+    );
+    const medListings = await MedListing.find({
+      _id: { $in: medListingsId },
+    })
+      .populate("dosages")
+      .populate("medicine");
+
+    // const filteredMedListings = medListings.filter((medListing) =>
+    //   medListing.dosages.some((dosageId) => dosageIds.includes(dosageId))
+    // );
+    // const dis = await DiseaseCaught.find({
+    //   ["diagnosis."]
+    // })
+    res.status(201).json({
+      patient: apps.data.patient,
+      appointments: apps.data.appointments,
+      medListings: medListings,
     });
   } catch (error) {
     console.error(error.message);

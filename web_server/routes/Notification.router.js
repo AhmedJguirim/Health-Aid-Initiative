@@ -12,6 +12,18 @@ router.get(
   "/notifications/todayCount",
   NotificationController.todaysNotificationsCount
 );
+router.get(
+  "/notifications/pastWeekCount",
+  NotificationController.notificationCountOfPastWeek
+);
+router.get(
+  "/notifications/pastMonthCount",
+  NotificationController.notificationCountOfPastMonth
+);
+router.get(
+  "/notifications/pastDayCount",
+  NotificationController.notificationCountOfPastDay
+);
 router.put(
   "/notifications/see/:notification",
   NotificationController.setNotificationAsSeen

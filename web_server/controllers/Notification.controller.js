@@ -93,3 +93,108 @@ exports.todaysNotificationsCount = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.notificationCountOfPastWeek = async (req, res) => {
+  try {
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thur", "Fri", "Sat"];
+
+    const notificationCounts = [];
+    const currentDate = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(currentDate);
+      date.setDate(currentDate.getDate() - i);
+
+      const count = await Notification.countDocuments({
+        doctor: decodedJwt.doctor_id,
+        patientID: req.query.patient,
+        createdAt: {
+          $gte: new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate() - 1
+          ).toISOString(),
+          $lt: date.toISOString(),
+        },
+      });
+
+      notificationCounts.push({
+        date: daysOfWeek[date.getDay()],
+        count: count,
+      });
+    }
+
+    return res.status(200).json(notificationCounts);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.notificationCountOfPastMonth = async (req, res) => {
+  try {
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+
+    const notificationCounts = [];
+    const currentDate = new Date();
+
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date(currentDate);
+      date.setDate(currentDate.getDate() - i);
+
+      const count = await Notification.countDocuments({
+        doctor: decodedJwt.doctor_id,
+        patientID: req.query.patient,
+        createdAt: {
+          $gte: new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate() - 1
+          ).toISOString(),
+          $lt: date.toISOString(),
+        },
+      });
+      const tempDate = date.toISOString().split("T")[0];
+      notificationCounts.push({
+        date: tempDate.split("-")[2] + "-" + tempDate.split("-")[1],
+        count: count,
+      });
+    }
+
+    return res.status(200).json(notificationCounts);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.notificationCountOfPastDay = async (req, res) => {
+  try {
+    const decodedJwt = await verifyJwt(req.headers.authorization);
+
+    const notificationCounts = [];
+    const currentDate = new Date();
+
+    for (let i = 0; i < 24; i++) {
+      const date = new Date(currentDate);
+      date.setHours(currentDate.getHours() - i);
+
+      const count = await Notification.countDocuments({
+        doctor: decodedJwt.doctor_id,
+        patientID: req.query.patient,
+        createdAt: {
+          $gte: date.toISOString(),
+          $lt: new Date(date.getTime() + 1 * 60 * 60 * 1000).toISOString(), // Add 1 hour to the current date
+        },
+      });
+
+      notificationCounts.push({
+        hour: date.getHours(),
+        count: count,
+      });
+    }
+
+    return res.status(200).json(notificationCounts);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};

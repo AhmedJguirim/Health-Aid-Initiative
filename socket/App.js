@@ -16,9 +16,20 @@ io.on("connection", (socket) => {
       .post("http://127.0.0.1:3001/api/notifications", NotificationBody)
       .then((response) => {
         console.log("notification created successfully");
-        socket.to(NotificationBody.doctor).emit("NOTIFICATION", response.data);
       })
       .catch((err) => console.log(err));
+  });
+  socket.on("Heart", (Heartrate, patientID) => {
+    socket.to(patientID).emit("HEARTRATE", Heartrate);
+  });
+  socket.on("Oxygen", (Oxygen, patientID) => {
+    socket.to(patientID).emit("Oxygen", Oxygen);
+  });
+  socket.on("Temperature", (Temperature, patientID) => {
+    socket.to(patientID).emit("Temperature", Temperature);
+  });
+  socket.on("BloodPressure", (BloodPressure1, BloodPressure2, patientID) => {
+    socket.to(patientID).emit("BloodPressure", Heartrate);
   });
 
   socket.on("leave-room", (doctor_id) => {

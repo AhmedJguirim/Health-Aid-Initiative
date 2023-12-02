@@ -54,6 +54,8 @@ const diagnosisRouter = require("./routes/Diagnosis.router.js");
 app.use("/api", diagnosisRouter);
 const notificationRouter = require("./routes/Notification.router.js");
 app.use("/api", notificationRouter);
+const justAnotherRouter = require("./routes/TheRest.router.js");
+app.use("/api", justAnotherRouter);
 
 app.listen(port, () => {
   console.log(`Server listening on the port  ${port}`);
