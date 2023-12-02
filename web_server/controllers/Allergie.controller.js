@@ -2,6 +2,7 @@ const Allergie = require("../schemas/Allergie.schema");
 
 // Create a new allergie
 exports.createAllergie = async (req, res) => {
+  // ... create and save the allergie here ...
   const { name } = req.body;
 
   try {
@@ -17,6 +18,7 @@ exports.createAllergie = async (req, res) => {
 // Get all allergies
 exports.getAllAllergies = async (req, res) => {
   try {
+    // ... retrieve all allergies from the database here ...
     const allergies = await Allergie.find();
     res.json(allergies);
   } catch (error) {
@@ -27,6 +29,7 @@ exports.getAllAllergies = async (req, res) => {
 // Get a specific allergie by name
 exports.getAllergieByName = async (req, res) => {
   const { name } = req.params;
+  // ... retrieve the allergie from the database by its name here ...
 
   try {
     const allergie = await Allergie.findOne({ name });
@@ -42,6 +45,8 @@ exports.getAllergieByName = async (req, res) => {
 
 // Update a allergie by name
 exports.updateAllergie = async (req, res) => {
+  // ... update the allergie in the database by its name here ...
+
   const { name } = req.params;
   const { newName } = req.body;
 
@@ -65,6 +70,7 @@ exports.updateAllergie = async (req, res) => {
 // Delete a allergie by name
 exports.deleteAllergie = async (req, res) => {
   const { name } = req.params;
+  // ... delete the allergie from the database by its name here ...
 
   try {
     const deletedAllergie = await Allergie.findOneAndDelete({ name });
@@ -81,6 +87,8 @@ exports.deleteAllergie = async (req, res) => {
 
 exports.partialSearch = async (req, res) => {
   try {
+    // ... perform a partial search on the allergies in the database here ...
+
     const partialName = req.params.partialName.toLowerCase(); // Convert to lowercase for case-insensitive search
 
     // Use a regular expression for partial matching

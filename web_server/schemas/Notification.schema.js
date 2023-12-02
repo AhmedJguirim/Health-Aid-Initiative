@@ -2,15 +2,17 @@
 
 const mongoose = require("mongoose");
 
-const highlightSchema = new mongoose.Schema({
+const notificationSchema = new mongoose.Schema({
   doctor: { type: String, required: true },
   patientID: { type: String, required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
   trigger: { type: String, required: true },
   seen: { type: Boolean, required: true, default: false },
+  createdAt: { type: Date, required: true, default: new Date() },
+  criticality: { type: Number, required: true, default: 1 },
 });
 
-const Highlight = mongoose.model("Heighlight", highlightSchema);
+const Notification = mongoose.model("Notification", notificationSchema);
 
-module.exports = Highlight;
+module.exports = Notification;
