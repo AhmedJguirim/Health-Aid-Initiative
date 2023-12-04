@@ -63,13 +63,13 @@ to see the complete list of APIs of the project please checkout the routes folde
 
 ## Main dependencies used
 Many libraries have been used in this project , the most important ones are:
-1- ExpressJS : used to easily create routes for the APIs
-2- jsonwebtoken : this library was needed to implements a jwt based authentication
-3- mongoose : used to send queries to our database servers
-4- node-forge : used in the end-to-end encryption as it provides an easy way to encrypt and decrypt data using RSA keys
-5- bcrypt : used for password hashing before putting it in the database
-6- axios : used for communication between different servers and sending API requests
-7- qrcode : used for qr code generation for the patients authentication
+- ExpressJS : used to easily create routes for the APIs
+- jsonwebtoken : this library was needed to implements a jwt based authentication
+- mongoose : used to send queries to our database servers
+- node-forge : used in the end-to-end encryption as it provides an easy way to encrypt and decrypt data using RSA keys
+- bcrypt : used for password hashing before putting it in the database
+- axios : used for communication between different servers and sending API requests
+- qrcode : used for qr code generation for the patients authentication
 
 ## Contact
 If you have any questions conserning certain functionalities or the installation process , feel free to contact me on my email: jguirimahmed111@gmail.com
