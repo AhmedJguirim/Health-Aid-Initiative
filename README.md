@@ -51,13 +51,13 @@ This project contains a multitude of API endpoints that serve serve the purposes
 
 ## Main API endpoints of the project
 i'll assume that you're gonna run the project on your local machine using port 3002
-doctor's authentication : localhost:3002/api/doctors/auth
-get a doctor's highlighted patients and data relevent to them : localhost:3002/api/HighlightedCards
-add an appointment's report to a patient's medical record : localhost:3002/api/diagnosis
-add a prescription to a patient : localhost:3002/api/prescriptions/:patient_id
-get a patient's medical record : localhost:3002/api/diagnosis/doctor?patient=[patient_id]
-patient's authentication : localhost:3002/api/patients/auth
-get patient's daily medecines : localhost:3002/api/dailyMedicines
+- doctor's authentication : localhost:3002/api/doctors/auth
+- get a doctor's highlighted patients and data relevent to them : localhost:3002/api/HighlightedCards
+- add an appointment's report to a patient's medical record : localhost:3002/api/diagnosis
+- add a prescription to a patient : localhost:3002/api/prescriptions/:patient_id
+- get a patient's medical record : localhost:3002/api/diagnosis/doctor?patient=[patient_id]
+- patient's authentication : localhost:3002/api/patients/auth
+- get patient's daily medecines : localhost:3002/api/dailyMedicines
 
 to see the complete list of APIs of the project please checkout the routes folders in the web_server.
 
