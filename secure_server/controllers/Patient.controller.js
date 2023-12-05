@@ -341,13 +341,34 @@ exports.checkCardValidity = async (req, res) => {
   }
 };
 
+function calculateAge(birthdate) {
+  return new Promise((resolve, reject) => {
+    try {
+      const currentDate = new Date();
+      const birthDate = new Date(birthdate);
+      let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+      // Adjust age if birthday hasn't occurred yet this year
+      if (
+        currentDate.getMonth() < birthDate.getMonth() ||
+        (currentDate.getMonth() === birthDate.getMonth() &&
+          currentDate.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+
+      resolve(age);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
 const Consent = require("../schemas/Consent.schema");
 exports.searchPatientByName = async (req, res) => {
   try {
     const consents = await Consent.find({
       doctor: req.query.doctor,
     });
-    console.log(req.query.doctor);
     const patientIds = consents.map((consent) => consent.patient);
     const patients = await Patient.find({
       name: { $regex: req.query.name, $options: "i" },
@@ -358,9 +379,25 @@ exports.searchPatientByName = async (req, res) => {
     if (patients == []) {
       return res.status(404).json({ error: "Patient not found" });
     }
+    const results = [];
+    for (const patient of patients) {
+      if (patient.birthDate) {
+        const age = await calculateAge(patient.birthDate);
+        // Optional: You can delete the 'birthdate' property if you don't need it anymore
+        results.push({
+          _id: patient._id,
+          name: patient.name,
+          age: age,
+          phoneNumber: patient.phoneNumber,
+          sex: patient.sex,
+          addresses: patient.addresses,
+        });
+        console.log(patient);
+      }
+    }
 
     res.json({
-      patients,
+      results,
     });
   } catch (error) {
     console.error(error.message);

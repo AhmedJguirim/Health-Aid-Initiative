@@ -23,14 +23,58 @@ exports.createHighlight = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+function calculateAge(birthdate) {
+  return new Promise((resolve, reject) => {
+    try {
+      const currentDate = new Date();
+      const birthDate = new Date(birthdate);
+      let age = currentDate.getFullYear() - birthDate.getFullYear();
 
+      // Adjust age if birthday hasn't occurred yet this year
+      if (
+        currentDate.getMonth() < birthDate.getMonth() ||
+        (currentDate.getMonth() === birthDate.getMonth() &&
+          currentDate.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+
+      resolve(age);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
 exports.getHighlightedPatients = async (req, res) => {
   try {
     const highlightedPatients = await Highlight.find({
       doctor: req.query.doctor,
-    }).populate("patient", "name patientID phoneNumber");
-
-    return res.status(200).json({ highlightedPatients: highlightedPatients });
+    }).populate("patient", "name patientID phoneNumber birthDate");
+    const results = [];
+    for (const highlightedPatient of highlightedPatients) {
+      if (highlightedPatient.patient.birthDate) {
+        const age = await calculateAge(highlightedPatient.patient.birthDate);
+        console.log(age);
+        highlightedPatient.patient.age = age;
+        // Optional: You can delete the 'birthdate' property if you don't need it anymore
+        results.push({
+          _id: highlightedPatient["_id"],
+          doctor: highlightedPatient.doctor,
+          patient: {
+            ["_id"]: highlightedPatient.patient["_id"],
+            patientID: highlightedPatient.patient.patientID,
+            name: highlightedPatient.patient.name,
+            age: age,
+            phoneNumber: highlightedPatient.patient.phoneNumber,
+          },
+        });
+      } else {
+        console.error(
+          `Error: birthDate missing for patient with ID ${patient.patientID}`
+        );
+      }
+    }
+    return res.status(200).json({ highlightedPatients: results });
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });
